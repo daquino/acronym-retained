@@ -1,9 +1,13 @@
 package vandy.mooc.operations;
 
+import android.content.Context;
+import android.os.AsyncTask;
+import android.os.RemoteException;
+import android.util.Log;
+
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-import vandy.mooc.R;
 import vandy.mooc.activities.MainActivity;
 import vandy.mooc.aidl.AcronymCall;
 import vandy.mooc.aidl.AcronymData;
@@ -11,16 +15,8 @@ import vandy.mooc.aidl.AcronymRequest;
 import vandy.mooc.aidl.AcronymResults;
 import vandy.mooc.services.AcronymServiceAsync;
 import vandy.mooc.services.AcronymServiceSync;
-import vandy.mooc.utils.AcronymDataArrayAdapter;
 import vandy.mooc.utils.GenericServiceConnection;
 import vandy.mooc.utils.Utils;
-import android.content.Context;
-import android.os.AsyncTask;
-import android.os.RemoteException;
-import android.util.Log;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ListView;
 
 /**
  * This class implements all the acronym-related operations defined in
@@ -36,27 +32,12 @@ public class AcronymOpsImpl implements AcronymOps {
      * Used to enable garbage collection.
      */
     protected WeakReference<MainActivity> mActivity;
-//
-//    /**
-//     * The ListView that will display the results to the user.
-//     */
-//    protected WeakReference<ListView> mListView;
-//
-//    /**
-//     * Acronym entered by the user.
-//     */
-//    protected WeakReference<EditText> mEditText;
 
     /**
      * List of results to display (if any).
      */
     protected List<AcronymData> mResults;
 
-    /**
-     * A custom ArrayAdapter used to display the list of AcronymData
-     * objects.
-     */
-//    protected WeakReference<AcronymDataArrayAdapter> mAdapter;
 
     /**
      * This GenericServiceConnection is used to receive results after
@@ -78,40 +59,7 @@ public class AcronymOpsImpl implements AcronymOps {
         mActivity = new WeakReference<>(activity);
 
         // Finish the initialization steps.
-        initializeViewFields();
         initializeNonViewFields();
-    }
-
-    /**
-     * Initialize the View fields, which are all stored as
-     * WeakReferences to enable garbage collection.
-     */
-    private void initializeViewFields() {
-        // Get references to the UI components.
-//        mActivity.get().setContentView(R.layout.main_activity);
-
-        // Store the EditText that holds the urls entered by the user
-        // (if any).
-//        mEditText = new WeakReference<>
-//            ((EditText) mActivity.get().findViewById(R.id.editText1));
-//
-//        // Store the ListView for displaying the results entered.
-//        mListView = new WeakReference<>
-//            ((ListView) mActivity.get().findViewById(R.id.listView1));
-
-        // Create a local instance of our custom Adapter for our
-        // ListView.
-//        mAdapter = new WeakReference<>
-//            (new AcronymDataArrayAdapter(mActivity.get()));
-
-//        // Set the adapter to the ListView.
-//        mListView.get().setAdapter(mAdapter.get());
-
-        // Display results if any (due to runtime configuration change).
-        if (mResults != null)
-            mActivity.get().displayResults(mResults);
-        else
-            Log.d(TAG, "No results!");
     }
 
     /**
@@ -181,12 +129,17 @@ public class AcronymOpsImpl implements AcronymOps {
     public void onConfigurationChange(MainActivity activity) {
         Log.d(TAG,
               "onConfigurationChange() called");
-
-        // Reset the mActivity WeakReference.
         mActivity = new WeakReference<>(activity);
+        updateResultsDisplay();
+    }
 
-        // (Re)initialize all the View fields.
-        initializeViewFields();
+    /**
+     * Initialize the View fields, which are all stored as
+     * WeakReferences to enable garbage collection.
+     */
+    private void updateResultsDisplay() {
+        if (mResults != null)
+            mActivity.get().displayResults(mResults);
     }
 
     /*
@@ -331,32 +284,4 @@ public class AcronymOpsImpl implements AcronymOps {
                     });
             }
 	};
-
-    /**
-     * Display the results to the screen.
-     *
-     * @param results
-     *            List of Results to be displayed.
-     */
-//    private void displayResults(List<AcronymData> results) {
-//        mResults = results;
-//
-//        // Set/change data set.
-//        mAdapter.get().clear();
-//        mAdapter.get().addAll(mResults);
-//        mAdapter.get().notifyDataSetChanged();
-//    }
-
-    /**
-     * Reset the display prior to attempting to expand a new acronym.
-     */
-//    private void resetDisplay() {
-////        Utils.hideKeyboard(mActivity.get(),
-////                           mEditText.get().getWindowToken());
-//        mActivity.get().hideKeyboard();
-//        mResults = null;
-//        mActivity.get().clearResults();
-////        mAdapter.get().clear();
-////        mAdapter.get().notifyDataSetChanged();
-//    }
 }
